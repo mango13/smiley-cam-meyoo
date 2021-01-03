@@ -2476,6 +2476,11 @@ expo-error-recovery@~1.4.0:
   dependencies:
     fbjs "1.0.0"
 
+expo-face-detector@^8.4.0:
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/expo-face-detector/-/expo-face-detector-8.4.0.tgz#696680bf8e90143538f85671827506ebf1482d30"
+  integrity sha512-XTzF6y9EirDU8xOINOGNQK7dBp0fqV7txUgAhfcHCHcKG0wdu9a8tXp5XkKFJLm9wyilOrBMpn/zq61n/FsIqw==
+
 expo-file-system@~9.3.0:
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-9.3.0.tgz#844c5197dbebf6c144d38e307372a49f3173186a"

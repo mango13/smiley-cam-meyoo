@@ -8,6 +8,7 @@ import {
 import { Camera } from "expo-camera";
 import styled from "styled-components/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as FaceDetector from 'expo-face-detector';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -31,19 +32,28 @@ export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.front);
   const [types, setTypes] = useState(null);
+  const [smileDetected, setSmileDetected] = useState(false);
 
   const switchCameraType = () => {
-      if(cameraType === Camera.Constants.Type.front) {
-          setCameraType(Camera.Constants.Type.back);
-      } else {
-          setCameraType(Camera.Constants.Type.front);
-      }
+    if (cameraType === Camera.Constants.Type.front) {
+      setCameraType(Camera.Constants.Type.back);
+    } else {
+      setCameraType(Camera.Constants.Type.front);
+    }
+  };
+
+  const onFacesDetected = ({faces}) => {
+    const face = faces[0];
+    if(face && face.smilingProbability > 0.7) {
+      console.log("take photo");
+      setSmileDetected(true);
+    }
+
   };
 
   useEffect(() => {
     (async () => {
       if (Platform.OS === "web") {
-        console.log(types);
         const types = await Camera.getAvailableCameraTypesAsync();
         setTypes(types);
         setHasPermission(true);
@@ -65,6 +75,12 @@ export default function App() {
             overflow: "hidden",
           }}
           type={cameraType}
+          onFacesDetected={smileDetected ? null : onFacesDetected}
+          faceDetectorSettings={{
+            detectLandmarks: FaceDetector.Constants.Landmarks.all,
+            runClassifications: FaceDetector.Constants.Classifications.all,
+          }}
+          // faceDetectionClassifications="all"
         />
         <IconBar>
           <TouchableOpacity onPress={switchCameraType}>
