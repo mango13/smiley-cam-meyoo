@@ -1,23 +1,33 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Platform,
-  ActivityIndicator,
-} from "react-native";
-import { Camera, Permissions } from "expo-camera";
+import { Platform, ActivityIndicator, Dimensions } from "react-native";
+import { Camera } from "expo-camera";
+import styled from "styled-components/native";
+
+const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
+
+const CenterView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: cornflowerblue;
+`;
+
+const Text = styled.Text`
+  color: white;
+  font-size: 22px;
+`;
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [types, setTypes] = useState(null);
+
   useEffect(() => {
     (async () => {
-      const types = await Camera.getAvailableCameraTypesAsync();
-      alert(JSON.stringify(types));
-      setTypes(types);
       if (Platform.OS === "web") {
+        // alert(JSON.stringify(types));
+        const types = await Camera.getAvailableCameraTypesAsync();
+        setTypes(types);
         setHasPermission(true);
       } else {
         const { status } = await Camera.requestPermissionsAsync();
@@ -28,18 +38,29 @@ export default function App() {
 
   if (hasPermission === true) {
     return (
-      <View>
-        <Text>Has permissions</Text>
-      </View>
+      <CenterView>
+        <Camera
+          style={{
+            width: WIDTH - 40,
+            height: HEIGHT / 1.5,
+            borderRadius: 20,
+            overflow: "hidden",
+          }}
+          type={Camera.Constants.Type.front}
+        />
+      </CenterView>
     );
   } else if (hasPermission === false) {
     return (
-      <View>
+      <CenterView>
         <Text>Don't have permission for this</Text>
-      </View>
+      </CenterView>
     );
   } else {
-    return <ActivityIndicator />;
+    return (
+      <CenterView>
+        <ActivityIndicator />
+      </CenterView>
+    );
   }
 }
-
