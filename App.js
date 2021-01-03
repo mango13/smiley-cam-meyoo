@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Platform,
   ActivityIndicator,
@@ -8,7 +8,8 @@ import {
 import { Camera } from "expo-camera";
 import styled from "styled-components/native";
 import { MaterialIcons } from "@expo/vector-icons";
-import * as FaceDetector from 'expo-face-detector';
+import * as FaceDetector from "expo-face-detector";
+import * as FileSystem from "expo-file-system";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -34,6 +35,8 @@ export default function App() {
   const [types, setTypes] = useState(null);
   const [smileDetected, setSmileDetected] = useState(false);
 
+  const cameraRef = useRef();
+
   const switchCameraType = () => {
     if (cameraType === Camera.Constants.Type.front) {
       setCameraType(Camera.Constants.Type.back);
@@ -42,13 +45,33 @@ export default function App() {
     }
   };
 
-  const onFacesDetected = ({faces}) => {
-    const face = faces[0];
-    if(face && face.smilingProbability > 0.7) {
-      console.log("take photo");
-      setSmileDetected(true);
-    }
+  const savePhoto = async (uri) => {
 
+
+  };
+
+  const takePhoto = async () => {
+    try {
+      if (cameraRef.current) {
+        let { uri } = await cameraRef.current.takePictureAsync({
+          quality: 1,
+        });
+        if (uri) {
+          savePhoto(uri);
+        }
+      }
+    } catch (e) {
+      alert(e);
+      setSmileDetected(false);
+    }
+  };
+
+  const onFacesDetected = ({ faces }) => {
+    const face = faces[0];
+    if (face && face.smilingProbability > 0.7) {
+      setSmileDetected(true);
+      takePhoto();
+    }
   };
 
   useEffect(() => {
@@ -80,7 +103,7 @@ export default function App() {
             detectLandmarks: FaceDetector.Constants.Landmarks.all,
             runClassifications: FaceDetector.Constants.Classifications.all,
           }}
-          // faceDetectionClassifications="all"
+          ref={cameraRef}
         />
         <IconBar>
           <TouchableOpacity onPress={switchCameraType}>
