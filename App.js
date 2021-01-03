@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Platform, ActivityIndicator, Dimensions } from "react-native";
+import {
+  Platform,
+  ActivityIndicator,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { Camera } from "expo-camera";
 import styled from "styled-components/native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -17,15 +23,27 @@ const Text = styled.Text`
   font-size: 22px;
 `;
 
+const IconBar = styled.View`
+  margin-top: 50px;
+`;
+
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [cameraType, setCameraType] = useState(Camera.Constants.Type.front);
   const [types, setTypes] = useState(null);
+
+  const switchCameraType = () => {
+      if(cameraType === Camera.Constants.Type.front) {
+          setCameraType(Camera.Constants.Type.back);
+      } else {
+          setCameraType(Camera.Constants.Type.front);
+      }
+  };
 
   useEffect(() => {
     (async () => {
       if (Platform.OS === "web") {
-        // alert(JSON.stringify(types));
+        console.log(types);
         const types = await Camera.getAvailableCameraTypesAsync();
         setTypes(types);
         setHasPermission(true);
@@ -46,8 +64,21 @@ export default function App() {
             borderRadius: 20,
             overflow: "hidden",
           }}
-          type={Camera.Constants.Type.front}
+          type={cameraType}
         />
+        <IconBar>
+          <TouchableOpacity onPress={switchCameraType}>
+            <MaterialIcons
+              name={
+                cameraType === Camera.Constants.Type.front
+                  ? "camera-front"
+                  : "camera-rear"
+              }
+              color="white"
+              size={50}
+            />
+          </TouchableOpacity>
+        </IconBar>
       </CenterView>
     );
   } else if (hasPermission === false) {
